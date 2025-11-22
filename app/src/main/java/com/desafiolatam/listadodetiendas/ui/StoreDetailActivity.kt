@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.desafiolatam.listadodetiendas.R
@@ -33,11 +34,20 @@ class StoreDetailActivity : AppCompatActivity() {
                 textViewStoreAddress.text = address
 
                 textViewStoreAddress.setOnClickListener {
-                    val geoIntentUri = Uri.parse("geo:0,0?q=$address")
-                    val mapIntent = Intent(Intent.ACTION_VIEW, geoIntentUri)
-                    mapIntent.setPackage("com.google.android.apps.maps")
-                    startActivity(mapIntent)
+                    try {
+                        val mapsUrl = "https://www.google.com/maps/search/?api=1&query=${Uri.encode(address)}"
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this@StoreDetailActivity,
+                            "Error al abrir mapa: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e("MAP_ERROR", "Error: ${e.message}")
+                    }
                 }
+
 
                 textViewStoreName.setOnClickListener {
                     val intent = Intent.makeMainSelectorActivity(
@@ -56,6 +66,9 @@ class StoreDetailActivity : AppCompatActivity() {
                     .centerCrop()
                     .error(R.drawable.baseline_error_outline_24)
                     .into(imageViewStore)
+            }
+            backButton.setOnClickListener {
+                finish()
             }
         }
     }
